@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paper DOOM - World's Only First-Person Sheet of Paper</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a1a;
+    overflow: hidden;
+    font-family: monospace;
+    color: #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  canvas {
+    display: block;
+    image-rendering: pixelated;
+  }
+  #hud {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    font-size: 13px;
+    color: #888;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #instructions {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: #555;
+    pointer-events: none;
+    z-index: 10;
+    text-align: center;
+  }
+  #panel-toggles {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.8);
+    padding: 10px 14px;
+    border-radius: 6px;
+    z-index: 20;
+    font-size: 13px;
+    line-height: 1.8;
+    border: 1px solid #444;
+  }
+  #panel-toggles label {
+    display: block;
+    cursor: pointer;
+    user-select: none;
+  }
+  #panel-toggles label:hover {
+    color: #ff0;
+  }
+  #panel-toggles input {
+    margin-right: 6px;
+    cursor: pointer;
+  }
+  #panel-toggles .title {
+    color: #999;
+    font-size: 11px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 3px;
+  }
+  .panel-btn {
+    margin-top: 4px;
+    padding: 4px 8px;
+    background: #333;
+    color: #ccc;
+    border: 1px solid #555;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 11px;
+    width: 100%;
+  }
+  .panel-btn:hover { background: #444; }
+  .panel-btn.active { background: #553; color: #ff0; border-color: #aa0; }
+  .panel-section {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #333;
+  }
+  .panel-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  #layer-order {
+    margin-top: 8px;
+    border-top: 1px solid #333;
+    padding-top: 6px;
+  }
+  #layer-order .title { margin-bottom: 4px; }
+  #layer-order .layer-item {
+    display: flex;
+    align-items: center;
+    padding: 2px 4px;
+    margin: 1px 0;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    cursor: grab;
+    font-size: 11px;
+    user-select: none;
+  }
+  #layer-order .layer-item:active { cursor: grabbing; }
+  #layer-order .layer-item.drag-over { border-top: 2px solid #ff0; }
+  #layer-order .layer-item .num {
+    color: #666;
+    margin-right: 6px;
+    min-width: 14px;
+  }
+</style>
+</head>
+<body>
+<div id="hud">PAPER DOOM</div>
+<canvas id="c"></canvas>
+<div id="panel-toggles">
+  <div class="panel-section">
+    <div class="title">CONTROLS</div>
+    <div style="font-size:11px; color:#777; margin-bottom:4px;">WASD / Arrows to move</div>
+    <button class="panel-btn" id="btn-paper">Paper Mode</button>
+    <button class="panel-btn" id="btn-3d">3D Origami Mode</button>
+    <button class="panel-btn" id="btn-doom">DOOM Mode</button>
+    <button class="panel-btn" id="btn-roam">Free Roam</button>
+    <div id="overlay-control" style="display:none; margin-top:6px;">
+      <label style="font-size:11px; color:#777;">Paper overlay: <span id="overlay-val">50</span>%</label>
+      <input type="range" id="overlay-opacity" min="0" max="100" value="50" style="width:100%; cursor:pointer;">
+    </div>
+    <div id="fog-control" style="display:none; margin-top:4px;">
+      <label style="font-size:11px; color:#777;">Draw distance: <span id="fog-val">4</span></label>
+      <input type="range" id="fog-dist" min="1" max="10" value="4" step="0.5" style="width:100%; cursor:pointer;">
+    </div>
+  </div>
+  <div class="panel-section">
+    <div class="title">PANEL LAYERS</div>
+    <label><input type="checkbox" id="tog-floor" checked> floor</label>
+    <label><input type="checkbox" id="tog-front" checked> front (back wall)</label>
+    <label><input type="checkbox" id="tog-left1" checked> left1 (far left)</label>
+    <label><input type="checkbox" id="tog-left2" checked> left2 (near left)</label>
+    <label><input type="checkbox" id="tog-right1" checked> right1 (far right)</label>
+    <label><input type="checkbox" id="tog-right2" checked> right2 (near right)</label>
+    <label><input type="checkbox" id="tog-black" checked> black (mask)</label>
+    <button class="panel-btn" id="mode-toggle">Mode: MANUAL</button>
+  </div>
+  <div class="panel-section" id="layer-order">
+    <div class="title">DRAW ORDER (drag to reorder, top=back)</div>
+    <div id="layer-list"></div>
+  </div>
+</div>
+<div id="instructions">WASD to move/turn | Checkboxes to toggle panels</div>
+<script src="engine.js"></script>
+</body>
+</html>
